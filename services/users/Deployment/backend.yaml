@@ -1,0 +1,81 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: user-backend
+  name: user-backend
+  namespace: default
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: user-backend
+  template:
+    metadata:
+      labels:
+        app: user-backend
+    spec:
+      containers:
+      - image: shreeda/major-backend:latest
+        name: user-backend
+        command: ["sh"]
+        args: ["/usr/src/app/entrypoint.sh"]
+        ports:
+        - containerPort: 2000
+      imagePullSecrets:
+      - name: regcred
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: user-backend
+spec:
+  ports:
+  - port: 2000
+    targetPort: 2000
+  selector:
+    app: user-backend
+
+---
+
+apiVersion: cert-manager.io/v1
+kind: ClusterIssuer
+metadata:
+  name: letsencrypt-prod
+spec:
+  acme:
+    email: shreeda.bhat@yahoo.com
+    server: https://acme-v02.api.letsencrypt.org/directory
+    privateKeySecretRef:
+      name: letsencrypt-secret-prod
+    solvers:
+    - http01:
+        ingress:
+          class: nginx
+---
+
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: user-backend
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+
+spec:
+  tls:  
+  - hosts:
+    -  "backend.ragnarok.rocks"
+    secretName: user-backend
+  rules:
+  - host: "backend.ragnarok.rocks"
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: user-backend
+            port:
+              number: 2000
