@@ -5,7 +5,8 @@ FROM python:3.7.2-alpine
 RUN apk update && \
     apk add --virtual build-deps gcc python-dev musl-dev && \
     apk add postgresql-dev && \
-    apk add netcat-openbsd
+    apk add netcat-openbsd && \
+    apk add build-base
 
 # set working directory
 WORKDIR /usr/src/app
@@ -22,4 +23,4 @@ RUN chmod +x /usr/src/app/entrypoint.sh
 COPY . /usr/src/app
 
 # run server
-CMD ["/usr/src/app/entrypoint.sh"]
+CMD ["sh","/usr/src/app/entrypoint.sh"]
