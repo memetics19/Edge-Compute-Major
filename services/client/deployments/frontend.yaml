@@ -18,8 +18,6 @@ spec:
       containers:
       - image: shreeda/major-frontend:latest
         name: user-frontend
-        command: ["sh"]
-        args: ["npm","start"]
         ports:
         - containerPort: 3000
       imagePullSecrets:
