@@ -18,6 +18,7 @@ spec:
       containers:
       - image: shreeda/major-frontend:latest
         name: user-frontend
+        command: ["yarn start"]
         ports:
         - containerPort: 3000
       imagePullSecrets:
@@ -64,3 +65,6 @@ spec:
             name: user-frontend
             port:
               number: 3000
+
+
+
